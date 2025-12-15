@@ -40,7 +40,7 @@ vim.pack.add({
 	{ src = "https://github.com/neovim/nvim-lspconfig" },
 	{ src = "https://github.com/nvim-lua/plenary.nvim" },
 	{ src = "https://github.com/nvim-tree/nvim-web-devicons" },
-	{ src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main"},
+	{ src = "https://github.com/nvim-treesitter/nvim-treesitter",        version = "main" },
 	{ src = "https://github.com/nvim-telescope/telescope.nvim",          version = "0.1.8" },
 	{ src = "https://github.com/nvim-telescope/telescope-ui-select.nvim" },
 	{ src = "https://github.com/aznhe21/actions-preview.nvim" },
@@ -51,30 +51,30 @@ vim.pack.add({
 
 
 --treesitter
-require 'nvim-treesitter.configs'.setup({
+require 'nvim-treesitter.config'.setup({
 	install_dir = vim.fn.stdpath('data') .. '/site',
 	ensure_installed = { "rust", "typescript", "javascript", "go", "c",
-		"astro", "markdown", "python", "prisma","cpp" },
+		"astro", "markdown", "python", "prisma" },
 	highlight = { enable = true },
 })
 
 vim.api.nvim_create_autocmd('FileType', {
 	pattern = { 'rust', 'javascript', 'zig', 'lua', 'elixir', 'markdown', 'docker', 'makefile',
-		'typescript', 'json', 'yaml', 'html', 'css', 'tsx', 'go','c', 'r', 'python', 'prisma',"cpp" },
+		'typescript', 'json', 'yaml', 'html', 'css', 'tsx', 'go', 'c', 'r', 'python', 'prisma' },
 	callback = function()
 		vim.treesitter.start()
 	end,
 })
 
---snips 
-require("luasnip").setup({enable_autosnippets = true})
+--snips
+require("luasnip").setup({ enable_autosnippets = true })
 require("luasnip.loaders.from_lua").load({ paths = "~/.config/nvim/snippets/" })
 local ls = require('luasnip')
 local map = vim.keymap.set
 
-map({"i"}, "<C-h>", function() ls.expand() end, {silent = true})
-map({"i", "s"}, "<C-j>", function() ls.jump(1) end, {silent = true})
-map({"i", "s"}, "<C-k>", function() ls.jump(-1) end, {silent = true})
+map({ "i" }, "<C-h>", function() ls.expand() end, { silent = true })
+map({ "i", "s" }, "<C-j>", function() ls.jump(1) end, { silent = true })
+map({ "i", "s" }, "<C-k>", function() ls.jump(-1) end, { silent = true })
 require "mason".setup()
 require "oil".setup({
 	view_options = {
@@ -149,7 +149,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 
--- git 
+-- git
 vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
 
 --supermaven

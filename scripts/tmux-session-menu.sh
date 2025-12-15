@@ -1,9 +1,9 @@
 #!/bin/bash
 
 DIRS=(
-    "$HOME/Documentos/proyectos"
-    "$HOME/Documentos"
-    "$HOME/Documentos/notas"
+    "$HOME/Documents/proyectos"
+    "$HOME/Documents"
+    "$HOME/Documents/notas"
     "$HOME"
 )
 
