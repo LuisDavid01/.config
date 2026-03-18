@@ -46,7 +46,8 @@ vim.pack.add({
 	{ src = "https://github.com/aznhe21/actions-preview.nvim" },
 	{ src = "https://github.com/supermaven-inc/supermaven-nvim" },
 	{ src = "https://github.com/tpope/vim-fugitive" },
-	{ src = "https://github.com/ThePrimeagen/harpoon",                   version = "harpoon2" }
+	{ src = "https://github.com/ThePrimeagen/harpoon",                   version = "harpoon2" },
+	{ src = "https://github.com/Saghen/blink.cmp",                       version = "v1.8.0" },
 })
 
 
@@ -54,18 +55,45 @@ vim.pack.add({
 require 'nvim-treesitter.config'.setup({
 	install_dir = vim.fn.stdpath('data') .. '/site',
 	ensure_installed = { "rust", "typescript", "javascript", "go", "c",
-		"astro", "markdown", "python", "prisma" },
+		"astro", "markdown", "python", "prisma", 'elixir', 'sql' },
 	highlight = { enable = true },
 })
 
 vim.api.nvim_create_autocmd('FileType', {
-	pattern = { 'rust', 'javascript', 'zig', 'lua', 'elixir', 'markdown', 'docker', 'makefile',
-		'typescript', 'json', 'yaml', 'html', 'css', 'tsx', 'go', 'c', 'r', 'python', 'prisma' },
+	pattern = { 'rust', 'js', 'zig', 'lua', 'elixir', 'markdown', 'docker', 'makefile',
+		'ts', 'tsx', 'json', 'yaml', 'html', 'css', 'tsx', 'go', 'c', 'r', 'python', 'prisma',
+		'sql', 'elixir'
+	},
+
 	callback = function()
 		vim.treesitter.start()
 	end,
 })
 
+-- blink
+local blink = require("blink.cmp")
+
+blink.setup({
+	completion = {
+		accept = {
+			auto_brackets = {
+				enabled = true,
+			},
+		},
+		documentation = { auto_show = false },
+	},
+	signature = { enabled = true },
+	keymap = {
+		preset = "default",
+	},
+	appearance = {
+		use_nvim_cmp_as_default = true,
+		nerd_font_variant = 'mono'
+	},
+	fuzzy = {
+		implementation = "prefer_rust",
+	},
+})
 --snips
 require("luasnip").setup({ enable_autosnippets = true })
 require("luasnip.loaders.from_lua").load({ paths = "~/.config/nvim/snippets/" })
@@ -118,33 +146,41 @@ vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Telescope buffers' 
 vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Telescope help tags' })
 
 
+local capabilities = blink.get_lsp_capabilities(
+	vim.lsp.protocol.make_client_capabilities()
+)
 
 vim.lsp.enable({
-	"lua_ls", "gopls", "tinymist",
-	"rust_analyzer", "clangd", "astro", "ts_ls", "emmet_ls",
-	"pyright", "prismals"
+	"lua_ls",
+	"gopls",
+	"tinymist",
+	"rust_analyzer",
+	"clangd",
+	"astro",
+	"ts_ls",
+	"emmet_ls",
+	"pyright",
+	"html-lsp",
+	'elixirls',
+	'angularls',
+	'prismals',
+	'tailwindcss',
+	capabilities = capabilities
 })
 
 vim.api.nvim_create_autocmd('LspAttach', {
 	group = vim.api.nvim_create_augroup('my.lsp', {}),
 	callback = function(args)
-		local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
-		if client:supports_method('textDocument/completion') then
-			-- Optional: trigger autocompletion on EVERY keypress. May be slow!
-			local opts = { buffer = args.buf, silent = true }
-			-- Keymaps para buffers con LSP
-			vim.keymap.set('n', '<leader>gd', vim.lsp.buf.definition, opts)
-			vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-			vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-			vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts)
-			vim.keymap.set('n', '<leader>f', function()
-				vim.lsp.buf.format { async = true }
-			end, opts)
-			vim.keymap.set('n', '<leader>gr', require('telescope.builtin').lsp_references, opts)
-			local chars = {}; for i = 32, 126 do table.insert(chars, string.char(i)) end
-			client.server_capabilities.completionProvider.triggerCharacters = chars
-			vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
-		end
+		local opts = { buffer = args.buf, silent = true }
+		-- Keymaps para buffers con LSP
+		vim.keymap.set('n', '<leader>gd', vim.lsp.buf.definition, opts)
+		vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+		vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+		vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts)
+		vim.keymap.set('n', '<leader>f', function()
+			vim.lsp.buf.format { async = true }
+		end, opts)
+		vim.keymap.set('n', '<leader>gr', require('telescope.builtin').lsp_references, opts)
 	end,
 })
 
@@ -154,6 +190,8 @@ vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
 
 --supermaven
 require('supermaven-nvim').setup({})
+
+
 
 vim.cmd [[set completeopt+=menuone,noselect,popup]]
 require "vague".setup({ transparent = true })
